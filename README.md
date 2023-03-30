@@ -7,3 +7,5 @@ This repository contains scripts used to analyse SNP data of the diatom *Skeleto
 2. **sync2VCF.R**: converts a sync file into a VCF file with a format that is compatible for SNP annotation with snpEff.
 
 Both scripts can be run using the terminal.
+
+**Citation:** please cite this GitHub repository.
