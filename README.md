@@ -8,4 +8,4 @@ This repository contains scripts used to analyse SNP data of the diatom *Skeleto
 
 Both scripts can be run using the terminal.
 
-**Citation:** please cite: Pinseel E., Ruck E.C., Nakov T., Jonsson P., Kourtchenko O., Kremp A., Roberts W.R., Sjöqvist C., Töpel M., Godhe A, Hahn M.H., Alverson A.J.  (2023). ​Local adaptation of a marine diatom is governed by genome-wide changes in diverse metabolic processes. BioRxiv. doi: 10.1101/2023.09.22.559080.
+**Citation:** please cite: Pinseel E., Ruck E.C., Nakov T., Jonsson P., Kourtchenko O., Kremp A., Pinder M.I.M., Roberts W.R., Sjöqvist C., Töpel M., Godhe A, Hahn M.H., Alverson A.J.  (2023). ​Local adaptation of a marine diatom is governed by genome-wide changes in diverse metabolic processes. BioRxiv. doi: 10.1101/2023.09.22.559080.
