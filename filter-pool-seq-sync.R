@@ -30,7 +30,7 @@ if("--help" %in% args | is.null(args$sync) | is.null(args$minCOV) | is.null(args
       --minCOV=Integer       - minimum coverage, for example: 10
       --maxCOV=File          - txt file specifying maximum coverage filter per contig per pool, for example: test.txt
       --MAC=Integer          - minimum allele count (MAC), for example: 4
-      --MAF=Proportion       - minimum allele frequency (MAF), for example: 0.001
+      --MAF=Proportion       - minimum allele frequency (MAF) as an integer (e.g., 0.01 = 1%), for example: 0.05
       --o=String             - name of the output folder (as a subfolder of the working directory), for example: /test-folder
       --help                 - print this text
 
@@ -81,7 +81,7 @@ if("--help" %in% args | is.null(args$sync) | is.null(args$minCOV) | is.null(args
           
       ## Minimum allele frequency (MAF)
           This script creates an output file with sites that did not pass the MAF filter
-          Sites that did not pass the MAF filter are not removed from the dataset
+          Sites that did not pass the MAF filter are also removed from the dataset
           
       ## Disclaimer on filtering conditions
           - Filtering is done in this order: minimum coverage, maximum coverage, MAC, multiallelic positions, removal of positions that are no SNPs
@@ -135,11 +135,11 @@ suppressMessages(require("YAPSA"))
 suppressMessages(require("gtools"))
 
 # to run in Rstudio:
-#sync = as.data.frame(fread(file="dummy2.sync", stringsAsFactors=FALSE, showProgress=FALSE))
-#minCOV = 20
+#sync = as.data.frame(fread(file="dummy.sync", stringsAsFactors=FALSE, showProgress=FALSE))
+#minCOV = 40
 #maxCOV = read.table(file="dummy-depth.txt", header = TRUE)
-#MAC = 3
-#MAF = 0.001
+#MAC = 2
+#MAF = 0.05
 #alertname = "/test-folder2"
 
 # get present working directory
@@ -525,15 +525,19 @@ IDs = as.data.frame(Ref.list[1])[,c(1:3)]
 MAFFAIL = cbind (IDs, Freqz, rAnge, mAx, mIn)
 MAFFAIL = as.data.frame(MAFFAIL)
 MAFFAIL = subset(MAFFAIL[,1:3], ((MAFFAIL$MAX >= (1-MAF) | MAFFAIL$MIN <= MAF) & (MAFFAIL$MAFT <= MAF)) )
-## print information on MAF filter
-pro.maf = round((nrow(MAFFAIL) / tot.snp * 100),2)
-paste0("Output: ", nrow(MAFFAIL), " SNPS (", pro.maf, "%) do not pass additional population MAF threshold of ", MAF, ", and have been noted but not removed.")
 
 paste0("STEP 3: MAF filter has been calculated.")
 
 # create a table with allele frequencies
 Freqz.F = cbind(IDs, ComPos, RarPos, Freqz)
 colnames(Freqz.F) = c("Chr", "Pos", "Ref", "Maj", "Min", names)
+
+# remove positions that did not pass MAF filter
+Freqz.F = Freqz.F[! rownames(Freqz.F) %in% rownames(MAFFAIL), ]
+
+## print information on MAF filter
+pro.maf = round((nrow(MAFFAIL) / tot.snp * 100),2)
+paste0("Output: ", nrow(MAFFAIL), " SNPS (", pro.maf, "%) do not pass additional population MAF threshold of ", MAF, ", and have been removed.")
 
 paste0("STEP 3: done. Allele frequencies have been calculated.")
 
@@ -568,6 +572,8 @@ for (i in c(1:npops)) {
 colnames(df) = names
 ## add row identifiers
 Fsync = cbind(IDs, df)
+## remove sites that did not pass the MAF filter
+Fsync = Fsync[! rownames(Fsync) %in% rownames(MAFFAIL), ]
 ##export file of all positions that passed filtering (including positions with missing data)
 outname = paste0(paste0(outdir, alertname, '/'), alertname, "-filtered_all.sync")
 write.table(Fsync, file=outname,
@@ -603,7 +609,7 @@ outname = paste0(paste0(outdir, alertname, '/'), alertname, "_MAC-fail.txt")
 write.table(sub.mac, file=outname,
             row.names=FALSE, col.names=TRUE, quote=FALSE)
 
-## MAF (note that these sites were not yet removed from the data, but they could be removed if wanted to)
+## MAF
 outname = paste0(paste0(outdir, alertname, '/'), alertname, "_MAF-fail.txt")
 write.table(MAFFAIL, file=outname,
             row.names=FALSE, col.names=FALSE, quote=FALSE)
